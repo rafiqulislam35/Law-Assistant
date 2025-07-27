@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 setup(
-    name = 'Generative AI Project',
+    name = 'Generative AI',
     version= '0.0.0',
     author = 'Rafiqul Islam',
     author_email= 'ri95879@gmail.com',
