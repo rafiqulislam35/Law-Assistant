@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <title>Chatbot - Brave Coder</title>
+</head>
+<body>
+
+  <div class="wrapper">
+    <div class="title">⚖️ Law Assistant</div>
+    <div class="box"></div>
+
+    <div class="typing-area">
+      <div class="input-field">
+        <input type="text" placeholder="Type your message..." required />
+        <button type="button"><i class="fa fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.querySelector(".input-field");
+    const input = form.querySelector("input");
+    const button = form.querySelector("button");
+    const chatBox = document.querySelector(".box");
+
+    // Send message on button click
+    button.addEventListener("click", async () => {
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      // Show user message
+      const userDiv = document.createElement("div");
+      userDiv.className = "item right";
+      userDiv.innerHTML = `<div class="msg"><p>${msg}</p></div>`;
+      chatBox.appendChild(userDiv);
+      input.value = "";
+
+      try {
+        const res = await fetch("/get", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({ msg }),
+        });
+
+        const reply = await res.text();
+
+        // Show bot reply
+        const botDiv = document.createElement("div");
+        botDiv.className = "item";
+        botDiv.innerHTML = `
+          <div class="icon"><i class="fa fa-user"></i></div>
+          <div class="msg"><p>${reply}</p></div>`;
+        chatBox.appendChild(botDiv);
+
+      } catch (error) {
+        console.error("Error:", error);
+      }
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    // Also trigger send on Enter key press
+    input.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        button.click();
+      }
+    });
+  </script>
+
+</body>
+</html>

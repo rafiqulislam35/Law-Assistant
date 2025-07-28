@@ -1,18 +1,22 @@
-from src.helper import load_huggingface_embeddings
-from langchain_pinecone import PineconeVectorStore
+# store_index.py
+
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from .env
+# Import only what you need to avoid circular issues
+from langchain_pinecone import PineconeVectorStore
+from src.helper import download_hugging_face_embeddings  # Make sure this is defined AFTER all other imports in helper.py
+
+# Load .env variables
 load_dotenv()
 
-# Define index name (must match your existing Pinecone index)
-index_name = "lawbot"  # <-- update if your actual index name is different
+# Set index name (must match your existing Pinecone index)
+index_name = "lawbot"  # <-- update this if needed
 
-# Load embedding model (uses HuggingFaceEmbeddings)
-embedding_model = load_huggingface_embeddings()
+# Load embeddings
+embedding_model = download_hugging_face_embeddings()
 
-# Connect to the existing Pinecone index
+# Load the existing Pinecone index
 docsearch = PineconeVectorStore.from_existing_index(
     index_name=index_name,
     embedding=embedding_model

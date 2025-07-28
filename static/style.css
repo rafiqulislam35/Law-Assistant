@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  background-image: url('/static/Images/background.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* 🔥 Bigger wrapper and chat box height */
+.wrapper {
+  width: 90%;
+  max-width: 900px;
+  height: 80vh; /* Increased from default */
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.wrapper .title {
+  background: #007bff;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* Increased height of .box area */
+.wrapper .box {
+  padding: 15px;
+  flex: 1; /* Take available space */
+  overflow-y: auto;
+}
+
+.wrapper .box .item {
+  display: flex;
+  align-items: flex-start;
+  margin: 10px 0;
+  clear: both;
+}
+
+.wrapper .box .item.right {
+  justify-content: flex-end;
+}
+
+.wrapper .box .item .icon {
+  background: #007bff;
+  color: white;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  line-height: 40px;
+  border-radius: 50%;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.wrapper .box .item .msg {
+  background: #007bff;
+  color: white;
+  border-radius: 10px;
+  padding: 10px 15px;
+  margin-left: 10px;
+  max-width: 70%;
+}
+
+.wrapper .box .item.right .msg {
+  background: #efefef;
+  color: #333;
+  margin-left: 0;
+  margin-right: 10px;
+}
+
+.wrapper .typing-area {
+  background: #f4f4f4;
+  padding: 10px 15px;
+  border-top: 1px solid #ccc;
+}
+
+.wrapper .typing-area .input-field {
+  width: 100%;
+  position: relative;
+}
+
+.wrapper .typing-area .input-field input {
+  width: 100%;
+  padding: 12px 50px 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  outline: none;
+  font-family: 'Poppins', sans-serif;
+  transition: 0.3s ease;
+}
+
+.wrapper .typing-area .input-field input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.wrapper .typing-area .input-field button {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  background: #007bff;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.wrapper .typing-area .input-field button:hover {
+  background: #0056b3;
+}
