@@ -32,7 +32,7 @@ def load_all_documents(folder_path):
     csv_docs = load_csv_documents(folder_path)
     pdf_docs = load_pdf_documents(folder_path)
     combined = csv_docs + pdf_docs
-    print(f"✅ Loaded {len(csv_docs)} CSV chunks and {len(pdf_docs)} PDF chunks")
+    print(f"Loaded {len(csv_docs)} CSV chunks and {len(pdf_docs)} PDF chunks")
     return combined
 
 
@@ -43,7 +43,7 @@ def split_into_chunks(docs, chunk_size=1000, chunk_overlap=200):
         chunk_overlap=chunk_overlap
     )
     chunks = splitter.split_documents(docs)
-    print(f"📦 Total final chunks: {len(chunks)}")
+    print(f"Total final chunks: {len(chunks)}")
     return chunks
 
 

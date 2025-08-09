@@ -1,18 +1,20 @@
+/* Import Google Font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
+/* Reset Defaults */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Body */
 body {
   font-family: 'Poppins', sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  margin: 0;
   background-image: url('/static/Images/background.jpg');
   background-size: cover;
   background-repeat: no-repeat;
@@ -20,19 +22,21 @@ body {
   background-attachment: fixed;
 }
 
-/* 🔥 Bigger wrapper and chat box height */
+/* Chat Container */
 .wrapper {
   width: 90%;
   max-width: 900px;
-  height: 80vh; /* Increased from default */
+  height: 80vh;
   background-color: rgba(255, 255, 255, 0.6);
-  border-radius: 10px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  backdrop-filter: blur(6px);
 }
 
+/* Chat Title */
 .wrapper .title {
   background: #007bff;
   color: white;
@@ -42,24 +46,39 @@ body {
   font-weight: 600;
 }
 
-/* Increased height of .box area */
+/* Chat Messages Area */
 .wrapper .box {
   padding: 15px;
-  flex: 1; /* Take available space */
+  flex: 1;
   overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
+/* Scrollbar Styling */
+.wrapper .box::-webkit-scrollbar {
+  width: 6px;
+}
+.wrapper .box::-webkit-scrollbar-thumb {
+  background: rgba(0, 123, 255, 0.6);
+  border-radius: 10px;
+}
+.wrapper .box::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 123, 255, 0.9);
+}
+
+/* Chat Items */
 .wrapper .box .item {
   display: flex;
   align-items: flex-start;
   margin: 10px 0;
-  clear: both;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 .wrapper .box .item.right {
   justify-content: flex-end;
 }
 
+/* User / Bot Icon */
 .wrapper .box .item .icon {
   background: #007bff;
   color: white;
@@ -70,8 +89,10 @@ body {
   border-radius: 50%;
   font-size: 18px;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
+/* Message Bubbles */
 .wrapper .box .item .msg {
   background: #007bff;
   color: white;
@@ -79,6 +100,7 @@ body {
   padding: 10px 15px;
   margin-left: 10px;
   max-width: 70%;
+  word-wrap: break-word;
 }
 
 .wrapper .box .item.right .msg {
@@ -88,6 +110,7 @@ body {
   margin-right: 10px;
 }
 
+/* Typing Area */
 .wrapper .typing-area {
   background: #f4f4f4;
   padding: 10px 15px;
@@ -114,6 +137,7 @@ body {
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
+/* Send Button */
 .wrapper .typing-area .input-field button {
   position: absolute;
   top: 50%;
@@ -130,4 +154,25 @@ body {
 
 .wrapper .typing-area .input-field button:hover {
   background: #0056b3;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media screen and (max-width: 600px) {
+  .wrapper {
+    height: 90vh;
+  }
+  .wrapper .title {
+    font-size: 18px;
+    padding: 10px;
+  }
+  .wrapper .box .item .msg {
+    max-width: 85%;
+    font-size: 14px;
+  }
 }

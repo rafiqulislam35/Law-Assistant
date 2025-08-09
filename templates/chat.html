@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
   <title>Chatbot - Brave Coder</title>
+  <!-- Load Marked.js for Markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
 
@@ -51,12 +53,15 @@
 
         const reply = await res.text();
 
+        // Parse reply as Markdown
+        const formattedReply = marked.parse(reply);
+
         // Show bot reply
         const botDiv = document.createElement("div");
         botDiv.className = "item";
         botDiv.innerHTML = `
           <div class="icon"><i class="fa fa-user"></i></div>
-          <div class="msg"><p>${reply}</p></div>`;
+          <div class="msg">${formattedReply}</div>`;
         chatBox.appendChild(botDiv);
 
       } catch (error) {
