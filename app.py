@@ -58,12 +58,12 @@ def index():
 
 @app.route("/get", methods=["GET", "POST"])
 def chat():
-    print("🟢 Flask route triggered")
+    print("Flask route triggered")
 
     try:
         msg = request.form.get("msg", "")
         if not msg.strip():
-            return "⚠️ Empty input received."
+            return "Empty input received."
 
         print(f"👤 User Input: {msg}")
 
@@ -71,14 +71,14 @@ def chat():
         answer = response.get("answer")
 
         if answer:
-            print("✅ Answer:", answer)
+            print(" Answer:", answer)
             return str(answer)
         else:
-            print("⚠️ No 'answer' key in response.")
+            print("No 'answer' key in response.")
             return "Sorry, no answer was found."
 
     except Exception as e:
-        print("❌ Error during /get route:", e)
+        print("Error during /get route:", e)
         traceback.print_exc()
         return "An internal error occurred. Please try again later."
 
