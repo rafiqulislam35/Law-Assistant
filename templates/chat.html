@@ -4,80 +4,117 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+
+  <!-- Icons + Styles -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-  <title>Chatbot - Brave Coder</title>
-  <!-- Load Marked.js for Markdown parsing -->
+
+  <title>⚖️ Law Assistant</title>
+
+  <!-- Markdown parser -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
 
   <div class="wrapper">
     <div class="title">⚖️ Law Assistant</div>
-    <div class="box"></div>
+    <div class="box" id="chatBox"></div>
 
     <div class="typing-area">
       <div class="input-field">
-        <input type="text" placeholder="Type your message..." required />
-        <button type="button"><i class="fa fa-paper-plane"></i></button>
+        <input id="chatInput" type="text" placeholder="Type your message..." required />
+        <button id="sendBtn" type="button" aria-label="Send">
+          <i class="fa fa-paper-plane"></i>
+        </button>
       </div>
     </div>
   </div>
 
   <script>
-    const form = document.querySelector(".input-field");
-    const input = form.querySelector("input");
-    const button = form.querySelector("button");
-    const chatBox = document.querySelector(".box");
+    const chatBox = document.getElementById("chatBox");
+    const input   = document.getElementById("chatInput");
+    const button  = document.getElementById("sendBtn");
 
-    // Send message on button click
-    button.addEventListener("click", async () => {
-      const msg = input.value.trim();
+    function scrollToBottom() {
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function addUserBubble(text) {
+      const el = document.createElement("div");
+      el.className = "item right";
+      el.innerHTML = `<div class="msg"><p>${text}</p></div>`;
+      chatBox.appendChild(el);
+      scrollToBottom();
+    }
+
+    function addBotBubble(markdownText) {
+      const el = document.createElement("div");
+      el.className = "item";
+      const html = marked.parse(markdownText || "");
+      el.innerHTML = `
+        <div class="icon"><i class="fa fa-user"></i></div>
+        <div class="msg">${html}</div>`;
+      chatBox.appendChild(el);
+      scrollToBottom();
+    }
+
+    function addTyping() {
+      const el = document.createElement("div");
+      el.className = "item";
+      el.id = "typing";
+      el.innerHTML = `
+        <div class="icon"><i class="fa fa-user"></i></div>
+        <div class="msg"><em>typing…</em></div>`;
+      chatBox.appendChild(el);
+      scrollToBottom();
+    }
+
+    function removeTyping() {
+      const t = document.getElementById("typing");
+      if (t) t.remove();
+    }
+
+    async function send() {
+      const msg = (input.value || "").trim();
       if (!msg) return;
 
-      // Show user message
-      const userDiv = document.createElement("div");
-      userDiv.className = "item right";
-      userDiv.innerHTML = `<div class="msg"><p>${msg}</p></div>`;
-      chatBox.appendChild(userDiv);
+      // UI: show user message + clear field
+      addUserBubble(msg);
       input.value = "";
+      input.focus();
+
+      // UI: lock send while awaiting
+      button.disabled = true;
+      addTyping();
 
       try {
-        const res = await fetch("/get", {
+        // 🔁 Memory-aware route
+        const res = await fetch("/memory-chat", {          // <-- updated endpoint
           method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams({ msg }),
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ msg })
         });
 
-        const reply = await res.text();
-
-        // Parse reply as Markdown
-        const formattedReply = marked.parse(reply);
-
-        // Show bot reply
-        const botDiv = document.createElement("div");
-        botDiv.className = "item";
-        botDiv.innerHTML = `
-          <div class="icon"><i class="fa fa-user"></i></div>
-          <div class="msg">${formattedReply}</div>`;
-        chatBox.appendChild(botDiv);
-
-      } catch (error) {
-        console.error("Error:", error);
+        const text = await res.text();
+        removeTyping();
+        addBotBubble(text);
+      } catch (err) {
+        console.error(err);
+        removeTyping();
+        addBotBubble("Sorry—something went wrong. Please try again.");
+      } finally {
+        button.disabled = false;
       }
+    }
 
-      chatBox.scrollTop = chatBox.scrollHeight;
-    });
+    // Click to send
+    button.addEventListener("click", send);
 
-    // Also trigger send on Enter key press
+    // Enter to send
     input.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        button.click();
-      }
+      if (e.key === "Enter") send();
     });
   </script>
-
 </body>
 </html>
