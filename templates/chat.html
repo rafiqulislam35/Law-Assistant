@@ -24,17 +24,23 @@
     <div class="typing-area">
       <div class="input-field">
         <input id="chatInput" type="text" placeholder="Type your message..." required />
-        <button id="sendBtn" type="button" aria-label="Send">
+        <!-- Voice button -->
+        <button id="micBtn" type="button" aria-label="Start voice input" title="Voice input">
+          <i class="fa fa-microphone"></i>
+        </button>
+        <!-- Send button -->
+        <button id="sendBtn" type="button" aria-label="Send" title="Send">
           <i class="fa fa-paper-plane"></i>
         </button>
       </div>
+      <div id="voiceHint" class="voice-hint" aria-live="polite"></div>
     </div>
   </div>
 
   <script>
     const chatBox = document.getElementById("chatBox");
     const input   = document.getElementById("chatInput");
-    const button  = document.getElementById("sendBtn");
+    const sendBtn = document.getElementById("sendBtn");
 
     function scrollToBottom() {
       chatBox.scrollTop = chatBox.scrollHeight;
@@ -58,16 +64,26 @@
       chatBox.appendChild(el);
       scrollToBottom();
     }
+    // Show welcome message on page load
+  window.addEventListener("DOMContentLoaded", () => {
+    addBotBubble("👋 Hello! Ask me anything about **Bangladeshi laws and legal matters.**");
+  });
 
     function addTyping() {
-      const el = document.createElement("div");
-      el.className = "item";
-      el.id = "typing";
-      el.innerHTML = `
-        <div class="icon"><i class="fa fa-user"></i></div>
-        <div class="msg"><em>typing…</em></div>`;
-      chatBox.appendChild(el);
-      scrollToBottom();
+    const el = document.createElement("div");
+    el.className = "item";
+    el.id = "typing";
+    el.innerHTML = `
+      <div class="icon"><i class="fa fa-user"></i></div>
+      <div class="msg typing-bubble" role="status" aria-label="Assistant is typing">
+        <span class="typing-dots">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </span>
+      </div>`;
+    chatBox.appendChild(el);
+    scrollToBottom();
     }
 
     function removeTyping() {
@@ -85,12 +101,12 @@
       input.focus();
 
       // UI: lock send while awaiting
-      button.disabled = true;
+      sendBtn.disabled = true;
       addTyping();
 
       try {
-        // 🔁 Memory-aware route
-        const res = await fetch("/memory-chat", {      
+        // Memory-aware route
+        const res = await fetch("/memory-chat", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: new URLSearchParams({ msg })
@@ -104,17 +120,90 @@
         removeTyping();
         addBotBubble("Sorry—something went wrong. Please try again.");
       } finally {
-        button.disabled = false;
+        sendBtn.disabled = false;
       }
     }
 
     // Click to send
-    button.addEventListener("click", send);
+    sendBtn.addEventListener("click", send);
 
     // Enter to send
     input.addEventListener("keypress", (e) => {
       if (e.key === "Enter") send();
     });
+
+    /* ---------------------------
+       Voice input (Speech to Text)
+    ---------------------------- */
+    const micBtn   = document.getElementById("micBtn");
+    const voiceHint = document.getElementById("voiceHint");
+
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognizer = null;
+    let recognizing = false;
+
+    if (SR) {
+      recognizer = new SR();
+      recognizer.lang = "en-US";            // change if you need another language
+      recognizer.interimResults = true;     // show interim text as you speak
+      recognizer.continuous = false;        // stop after a short phrase
+
+      recognizer.onstart = () => {
+        recognizing = true;
+        micBtn.classList.add("recording");
+        micBtn.setAttribute("aria-label", "Stop voice input");
+        voiceHint.textContent = "Listening… speak now";
+      };
+
+      recognizer.onresult = (event) => {
+        let transcript = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        // Write what we hear into the input box
+        input.value = transcript;
+      };
+
+      recognizer.onerror = (event) => {
+        console.warn("SpeechRecognition error:", event.error);
+        voiceHint.textContent = event.error === "no-speech"
+          ? "No speech detected. Try again."
+          : "Voice input error. Please try again.";
+      };
+
+      recognizer.onend = () => {
+        recognizing = false;
+        micBtn.classList.remove("recording");
+        micBtn.setAttribute("aria-label", "Start voice input");
+        if (!input.value) {
+          voiceHint.textContent = "Tap the mic and speak to dictate.";
+        } else {
+          voiceHint.textContent = "Dictation complete. You can edit or press Send.";
+          input.focus();
+          // If you prefer auto-send when the speech ends, uncomment the next line:
+          // send();
+        }
+      };
+    } else {
+      // Not supported
+      micBtn.addEventListener("click", () => {
+        alert("Sorry, your browser doesn't support voice input (Web Speech API). Try Chrome/Edge.");
+      });
+      voiceHint.textContent = "Voice input not supported in this browser.";
+    }
+
+    function toggleMic() {
+      if (!recognizer) return;
+      if (recognizing) {
+        recognizer.stop();
+      } else {
+        input.focus();
+        voiceHint.textContent = "Starting microphone…";
+        recognizer.start();
+      }
+    }
+
+    micBtn.addEventListener("click", toggleMic);
   </script>
 </body>
 </html>

@@ -27,7 +27,7 @@ body {
   width: 90%;
   max-width: 900px;
   height: 80vh;
-  background-color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.45); /* lighter so wallpaper shows */
   border-radius: 12px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
   overflow: hidden;
@@ -38,7 +38,7 @@ body {
 
 /* Chat Title */
 .wrapper .title {
-  background: #007bff;
+  background: #3184dd;
   color: white;
   text-align: center;
   padding: 15px;
@@ -55,15 +55,13 @@ body {
 }
 
 /* Scrollbar Styling */
-.wrapper .box::-webkit-scrollbar {
-  width: 6px;
-}
+.wrapper .box::-webkit-scrollbar { width: 6px; }
 .wrapper .box::-webkit-scrollbar-thumb {
-  background: rgba(0, 123, 255, 0.6);
+  background: rgba(49, 132, 221, 0.6);
   border-radius: 10px;
 }
 .wrapper .box::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 123, 255, 0.9);
+  background: rgba(49, 132, 221, 0.9);
 }
 
 /* Chat Items */
@@ -73,14 +71,11 @@ body {
   margin: 10px 0;
   animation: fadeIn 0.3s ease-in-out;
 }
-
-.wrapper .box .item.right {
-  justify-content: flex-end;
-}
+.wrapper .box .item.right { justify-content: flex-end; }
 
 /* User / Bot Icon */
 .wrapper .box .item .icon {
-  background: #007bff;
+  background: #3184dd;
   color: white;
   width: 40px;
   height: 40px;
@@ -89,25 +84,32 @@ body {
   border-radius: 50%;
   font-size: 18px;
   flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
 }
 
-/* Message Bubbles */
+/* Message Bubbles (BOT reply) */
 .wrapper .box .item .msg {
-  background: #007bff;
-  color: white;
-  border-radius: 10px;
-  padding: 10px 30px;
+  background: rgba(49, 132, 221, 0.6);   /* translucent so bg shows */
+  color: black;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  padding: 12px 30px;
   margin-left: 10px;
   max-width: 70%;
   word-wrap: break-word;
+  backdrop-filter: blur(2px);
 }
 
+/* Message Bubbles (USER question) */
 .wrapper .box .item.right .msg {
-  background: #efefef;
-  color: #333;
+  background: rgba(239, 239, 239, 0.2);
+  color: #222;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   margin-left: 0;
   margin-right: 10px;
+  border-radius: 14px;
+  padding: 12px 30px;
+  backdrop-filter: blur(2px);
 }
 
 /* Typing Area */
@@ -116,63 +118,114 @@ body {
   padding: 10px 15px;
   border-top: 1px solid #ccc;
 }
-
 .wrapper .typing-area .input-field {
   width: 100%;
   position: relative;
 }
 
+/* Input (extra right padding for mic + send buttons) */
 .wrapper .typing-area .input-field input {
   width: 100%;
-  padding: 12px 50px 12px 15px;
+  padding: 12px 96px 12px 15px;
   border: 1px solid #ccc;
   border-radius: 30px;
   outline: none;
   font-family: 'Poppins', sans-serif;
   transition: 0.3s ease;
 }
-
 .wrapper .typing-area .input-field input:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  border-color: #3184dd;
+  box-shadow: 0 0 5px rgba(49,132,221,.5);
 }
 
-/* Send Button */
+/* Round icon buttons */
 .wrapper .typing-area .input-field button {
   position: absolute;
   top: 50%;
-  right: 10px;
   transform: translateY(-50%);
-  background: #007bff;
+  background: #3184dd;
   border: none;
   padding: 10px 12px;
   border-radius: 50%;
-  color: white;
+  color: #fff;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, transform 0.15s ease;
+}
+.wrapper .typing-area .input-field #micBtn { right: 56px; }
+.wrapper .typing-area .input-field #sendBtn { right: 10px; }
+.wrapper .typing-area .input-field button:hover { background: #2a71bd; }
+.wrapper .typing-area .input-field button:active { transform: translateY(-50%) scale(0.96); }
+
+/* Voice hint line */
+.voice-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #444;
+  min-height: 16px;
 }
 
-.wrapper .typing-area .input-field button:hover {
-  background:#0056b3;
+/* Mic "recording" pulse */
+#micBtn.recording { animation: pulse 1.2s infinite ease-in-out; }
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.6); background:#dc3545; }
+  70%  { box-shadow: 0 0 0 12px rgba(220, 53, 69, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
 }
 
-/* Animation */
+/* ===== Messenger-style typing indicator (dark pill + 3 pulsing dots) ===== */
+.typing-bubble {
+  background: #2b2f36;                 /* dark slate pill */
+  border: 1px solid rgba(255,255,255,.08);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  min-width: 56px;
+  height: 32px;
+  border-radius: 999px;                 /* full pill */
+  box-shadow: 0 4px 10px rgba(0,0,0,.25);
+}
+
+.typing-dots {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.typing-dots .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #cfd3da;                 /* dim white/gray like Messenger */
+  opacity: .35;                         /* start faint */
+  transform: translateY(0) scale(1);
+  animation: messenger-dots 1.2s infinite ease-in-out;
+}
+
+.typing-dots .dot:nth-child(2) { animation-delay: .15s; }
+.typing-dots .dot:nth-child(3) { animation-delay: .30s; }
+
+@keyframes messenger-dots {
+  0%, 80%, 100% { opacity: .35; transform: translateY(0) scale(1); }
+  40%           { opacity: 1;    transform: translateY(-3px) scale(1.15); }
+}
+
+/* Reduce motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .typing-dots .dot { animation: none; opacity: .7; }
+}
+
+/* Fade-in animation for messages */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Responsive */
 @media screen and (max-width: 600px) {
-  .wrapper {
-    height: 90vh;
-  }
-  .wrapper .title {
-    font-size: 18px;
-    padding: 10px;
-  }
-  .wrapper .box .item .msg {
-    max-width: 85%;
-    font-size: 14px;
-  }
+  .wrapper { height: 90vh; }
+  .wrapper .title { font-size: 18px; padding: 10px; }
+  .wrapper .box .item .msg { max-width: 85%; font-size: 14px; }
 }
