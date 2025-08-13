@@ -15,7 +15,6 @@ from langchain_community.llms import Ollama
 from src.helper import download_hugging_face_embeddings
 from src.prompt import system_prompt, memory_prompt
 
-# ──────────────────────────────────────────────
 load_dotenv()
 os.environ["PINECONE_API_KEY"] = os.getenv("PINECONE_API_KEY")
 
@@ -29,7 +28,6 @@ retriever = docsearch.as_retriever(search_type="similarity", search_kwargs={"k":
 
 llm = Ollama(model="llama3", temperature=0.4)
 
-# No‑memory chain (your original)
 base_prompt = ChatPromptTemplate.from_messages([
     ("system", system_prompt),
     ("human", "{input}")
@@ -46,7 +44,6 @@ memory_prompt_tpl = ChatPromptTemplate.from_messages([
 memory_qa = create_stuff_documents_chain(llm, memory_prompt_tpl)
 memory_rag_chain = create_retrieval_chain(retriever, memory_qa)
 
-# ──────────────────────────────────────────────
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret")  # required for sessions
 
